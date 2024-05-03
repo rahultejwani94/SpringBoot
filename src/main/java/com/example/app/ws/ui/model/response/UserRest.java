@@ -5,6 +5,7 @@ public class UserRest {
 	private String firstName;
 	private String lastName;
 	private String userId;
+	
 	public String getEmail() {
 		return email;
 	}
