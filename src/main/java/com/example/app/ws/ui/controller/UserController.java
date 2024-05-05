@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.app.ws.exceptions.CustomException;
 import com.example.app.ws.ui.model.request.UpdateUserDetailsRequestModel;
 import com.example.app.ws.ui.model.request.UserDetailsRequestModel;
 import com.example.app.ws.ui.model.response.UserRest;
@@ -44,6 +45,8 @@ public class UserController {
 					MediaType.APPLICATION_JSON_VALUE
 			})
 	public ResponseEntity<UserRest> getUser(@PathVariable String userId) {
+		if(true)
+			throw new CustomException("custom exception thrown");
 		String firstName = null;
 		int len = firstName.length();
 		if(usersMap.containsKey(userId)) {
