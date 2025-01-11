@@ -5,4 +5,5 @@ import com.example.app.ws.ui.model.response.UserRest;
 
 public interface UserService {
 	UserRest createUser(UserDetailsRequestModel userDetails);
+	String doSomething();
 }

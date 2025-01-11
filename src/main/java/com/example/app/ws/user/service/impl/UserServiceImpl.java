@@ -11,7 +11,7 @@ import com.example.app.ws.ui.model.request.UserDetailsRequestModel;
 import com.example.app.ws.ui.model.response.UserRest;
 import com.example.app.ws.user.service.UserService;
 
-@Service
+@Service("UserServiceImpl")
 public class UserServiceImpl implements UserService {
 
 	Map<String, UserRest> usersMap;
@@ -19,13 +19,16 @@ public class UserServiceImpl implements UserService {
 	Utils utils;
 	
 	public UserServiceImpl() {}
-	
+
+
+
 	@Autowired
 	public UserServiceImpl(Utils utils) {
 		this.utils = utils;
 	}
 	@Override
 	public UserRest createUser(UserDetailsRequestModel userDetails) {
+		UserRest u = new UserRest();
 		UserRest userRest = new UserRest();
 		userRest.setEmail(userDetails.getEmail());
 		userRest.setFirstName(userDetails.getFirstName());
@@ -39,6 +42,11 @@ public class UserServiceImpl implements UserService {
 			usersMap.put(userId, userRest);
 		}
 		return userRest;
+	}
+
+	@Override
+	public String doSomething() {
+		return "UserServiceImpl";
 	}
 
 }

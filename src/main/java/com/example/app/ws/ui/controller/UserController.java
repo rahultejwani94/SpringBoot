@@ -1,8 +1,11 @@
 package com.example.app.ws.ui.controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import com.example.app.ws.factory.UserServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 
 import org.springframework.http.MediaType;
@@ -25,18 +28,23 @@ import com.example.app.ws.user.service.UserService;
 
 import jakarta.validation.Valid;
 
+
 @RestController
 @RequestMapping("users")
 public class UserController {
 
 	Map<String, UserRest> usersMap;
-	
+
 	@Autowired
+	private UserServiceFactory userServiceFactory;
+
+	@Autowired
+	@Qualifier("UserServiceImpl")
 	UserService userService;
 	
 	@GetMapping
-	public String getUser(@RequestParam(value = "page", defaultValue = "1", required = false) int page, @RequestParam(value = "limit", defaultValue = "50") int limit,
-			@RequestParam(value = "sort", defaultValue = "asc", required = false) String sort
+	public String getUsers(@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "limit", defaultValue = "50") int limit,
+                           @RequestParam(value = "sort", defaultValue = "asc", required = false) String sort
 			) {
 		return "get user called with page = " + page + " and limit = " + limit + " sort = " + sort;
 	}
@@ -48,15 +56,15 @@ public class UserController {
 					MediaType.APPLICATION_JSON_VALUE
 			})
 	public ResponseEntity<UserRest> getUser(@PathVariable String userId) {
-		if(true)
-			throw new CustomException("custom exception thrown");
-		String firstName = null;
-		int len = firstName.length();
+//		if(true)
+//			throw new CustomException("custom exception thrown");
+//		String firstName = null;
+//		int len = firstName.length();
 		if(usersMap.containsKey(userId)) {
-			return new ResponseEntity<UserRest>(usersMap.get(userId), HttpStatus.OK); 
+			return new ResponseEntity<>(usersMap.get(userId), HttpStatus.OK);
 		}
 		else {
-			return new ResponseEntity<UserRest>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
 	}
 
@@ -72,6 +80,10 @@ public class UserController {
 			)
 	public ResponseEntity<UserRest> createUser(@Valid @RequestBody UserDetailsRequestModel userDetails) {
 		UserRest userRest = userService.createUser(userDetails);
+		if(usersMap == null) {
+			usersMap = new HashMap<>();
+		}
+		usersMap.put(userRest.getUserId(), userRest);
 		return new ResponseEntity<UserRest>(userRest, HttpStatus.OK);
 	}
 
@@ -91,10 +103,10 @@ public class UserController {
 			storedUserDetails.setLastName(userDetails.getLastName());
 			
 			usersMap.put(userId, storedUserDetails);
-			return new ResponseEntity<UserRest>(storedUserDetails, HttpStatus.OK);
+			return new ResponseEntity<>(storedUserDetails, HttpStatus.OK);
 		}
 		else {
-			return new ResponseEntity<UserRest>(HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
@@ -102,10 +114,16 @@ public class UserController {
 	public ResponseEntity<String> deleteUser(@PathVariable String userId) {
 		if(usersMap.containsKey(userId)) {
 			usersMap.remove(userId);
-			return new ResponseEntity<String>("userId: "+ userId + " is deleted", HttpStatus.OK);
+			return new ResponseEntity<>("userId: "+ userId + " is deleted", HttpStatus.OK);
 		}
 		else {
-			return new ResponseEntity<String>("userId: "+ userId + " doesn't exist", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("userId: "+ userId + " doesn't exist", HttpStatus.NOT_FOUND);
 		}
+	}
+
+	@GetMapping("/factory/{type}")
+	public ResponseEntity<String> getFactoryService(@PathVariable String type){
+		String value = userServiceFactory.getService(type).doSomething();
+		return new ResponseEntity<>(value, HttpStatus.OK);
 	}
 }
